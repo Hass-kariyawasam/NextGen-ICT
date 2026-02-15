@@ -4,7 +4,7 @@ import ThemeContextProvider from './context/ThemeContext';
 import { AuthContextProvider, useAuth } from './context/AuthContext';
 
 // Pages
-import SignIn from './pages/SignIn';
+import SignInSide from './pages/SignInSide';
 import Home from './pages/Home';
 
 // Protected Route (Login wela nathnam Dashboard yanna ba)
@@ -38,7 +38,7 @@ export default function App() {
                         <Route path="/" element={<Home />} />
                         
                         {/* Login Page */}
-                        <Route path="/login" element={<SignIn />}/>
+                        <Route path="/login" element={<SignInSide />} />
                         
                         {/* Dashboard */}
                         <Route path="/dashboard-lms" element={

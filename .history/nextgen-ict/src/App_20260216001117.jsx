@@ -38,7 +38,7 @@ export default function App() {
                         <Route path="/" element={<Home />} />
                         
                         {/* Login Page */}
-                        <Route path="/login" element={<SignIn />}/>
+                        <Route path="/login" element={<SignIn />}
                         
                         {/* Dashboard */}
                         <Route path="/dashboard-lms" element={

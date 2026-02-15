@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MenuIcon, XIcon } from "lucide-react";
-import { motion } from "framer-motion"; // මෙන්න මේක පාවිච්චි වෙන්න ඕන පහල
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom"; // මෙන්න මේක import කරන්න ඕන
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,13 +15,13 @@ export default function Navbar() {
 
     return (
         <>
-            {/* මෙතන <motion.nav> තියෙන්න ඕන. <nav> තිබුණොත් අර error එක එනවා */}
             <motion.nav className="sticky top-0 z-50 flex items-center justify-between w-full h-18 px-6 md:px-16 lg:px-24 xl:px-32 backdrop-blur"
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 250, damping: 70, mass: 1 }}
             >
+                {/* Logo eka click kalahama Home ekata yanna hadamu */}
                 <Link to="/">
                     <img className="h-9 w-auto" src="/agentix-react/assets/logo.svg" width={138} height={36} alt="logo" />
                 </Link>
@@ -39,12 +39,13 @@ export default function Navbar() {
                         Get started
                     </button>
                     
-                    {/* Login Button eka Link karala */}
+                    {/* --- METHANA THAMAI WENASA --- */}
                     <Link to="/login">
                         <button className="hover:bg-slate-300/20 transition px-6 py-2 border border-slate-400 rounded-md active:scale-95">
                             Login
                         </button>
                     </Link>
+                    {/* ----------------------------- */}
                 </div>
 
                 <button onClick={() => setIsMenuOpen(true)} className="lg:hidden active:scale-90 transition">
@@ -60,6 +61,7 @@ export default function Navbar() {
                     </a>
                 ))}
                 
+                {/* Mobile Menu eketh Login button eka daamu */}
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                     <button className="px-6 py-2 border border-slate-400 rounded-md">
                         Login
