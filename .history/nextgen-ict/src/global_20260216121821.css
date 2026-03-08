@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+    --font-poppins: "Poppins", sans-serif;
+}
+
+:root {
+    /* Oyage Color Palette Eka */
+    --bg-dark: #000000;       /* Deep Navy Background */
+    --color-primary: #000000; /* Royal Blue */
+    --color-accent: #9AC8CD;  /* Soft Teal */
+    --color-text: #E1F7F5;    /* Pale Mint Text */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--color-text);
+    font-family: var(--font-poppins);
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* --- OVERRIDES --- */
+/* Template eke thiyena 'bg-indigo-600' class eka oyage Blue color ekata harawamu */
+.bg-indigo-600 {
+    background-color: var(--color-primary) !important;
+}
+
+.hover\:bg-indigo-700:hover {
+    background-color: #0b3680 !important; /* Darker blue for hover */
+}
+
+.text-indigo-600 {
+    color: var(--color-accent) !important;
+}
+
+.border-indigo-600 {
+    border-color: var(--color-primary) !important;
+}
+
+.border-indigo-900 {
+    border-color: rgba(14, 70, 163, 0.3) !important;
+}
+
+/* Background Gradients Override */
+.from-\[\#401B98\]\/5 {
+    --tw-gradient-from: rgba(30, 3, 66, 0.5) !important;
+}

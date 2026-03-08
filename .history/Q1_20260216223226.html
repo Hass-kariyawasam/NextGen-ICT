@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <script>
+    let arry1 = [1,2,3];
+    let newarry = [];
+     var customMap = (arry,callback)  => {
+      
+
+
+        for( x = 0; x < arry.length; x++){
+
+
+            newarry.push(callback(arry[x]));
+
+        }
+
+        
+     }
+     customMap(arry1, num => num*3)
+
+     
+     console.log(newarry);
+    
+   </script>
+</head>
+<body>
+    
+</body>
+</html>

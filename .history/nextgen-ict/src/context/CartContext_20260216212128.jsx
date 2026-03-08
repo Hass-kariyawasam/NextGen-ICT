@@ -1,0 +1,70 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase/config';
+import {
+  collection, addDoc, getDocs, query,
+  where, doc, updateDoc, serverTimestamp
+} from 'firebase/firestore';
+import { useAuth } from './AuthContext';
+
+const CartContext = createContext();
+
+export function CartProvider({ children }) {
+  const { user } = useAuth();
+  const [cart, setCart]                       = useState([]);
+  const [enrollments, setEnrollments]         = useState([]);   // from Firestore
+  const [loadingEnrollments, setLoadingEnrollments] = useState(true);
+
+  // ── Fetch enrollments from Firestore ──────────────────────────────────────
+  const fetchEnrollments = async () => {
+    if (!user) { setEnrollments([]); setLoadingEnrollments(false); return; }
+    setLoadingEnrollments(true);
+    const q = query(collection(db, "enrollments"), where("userId", "==", user.uid));
+    const snap = await getDocs(q);
+    setEnrollments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    setLoadingEnrollments(false);
+  };
+
+  useEffect(() => { fetchEnrollments(); }, [user]);
+
+  // ── Cart helpers ──────────────────────────────────────────────────────────
+  const addToCart = (course) => {
+    if (!cart.find(c => c.id === course.id) && !isEnrolled(course.id)) {
+      setCart(prev => [...prev, course]);
+    }
+  };
+  const removeFromCart  = (courseId) => setCart(prev => prev.filter(c => c.id !== courseId));
+  const isInCart        = (courseId) => cart.some(c => c.id === courseId);
+  const isEnrolled      = (courseId) =>
+    enrollments.some(e => e.courseId === courseId && e.status === 'approved');
+  const isPending       = (courseId) =>
+    enrollments.some(e => e.courseId === courseId && e.status === 'pending');
+  const cartTotal       = cart.reduce((s, c) => s + (c.price || 0), 0);
+
+  // ── Buy: creates enrollment doc with status=pending + slip URL ───────────
+  const buyNow = async (course, slipUrl = null) => {
+    if (!user) return;
+    await addDoc(collection(db, "enrollments"), {
+      userId:       user.uid,
+      courseId:     course.id,
+      courseTitle:  course.title,
+      price:        course.price,
+      status:       'pending',
+      slipUrl:      slipUrl || null,
+      enrolledAt:   serverTimestamp(),
+    });
+    setCart(prev => prev.filter(c => c.id !== course.id));
+    await fetchEnrollments();
+  };
+
+  return (
+    <CartContext.Provider value={{
+      cart, addToCart, removeFromCart, isInCart,
+      isEnrolled, isPending, enrollments,
+      loadingEnrollments, cartTotal, buyNow, fetchEnrollments
+    }}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export const useCart = () => useContext(CartContext);
