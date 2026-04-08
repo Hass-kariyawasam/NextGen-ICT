@@ -1,0 +1,70 @@
+NextGen-ICT LMS redesign update
+
+Main changes
+- Student LMS redesigned with a separate visual system in src/styles/lms.css.
+- Main site background reset to white; LMS styling kept separate.
+- Desktop sidebar made compact.
+- Mobile navigation moved to a bottom bar.
+- Header countdown now reads exam date from Firestore settings in real time.
+- Courses page now reads courses from Firestore in real time, with mock fallback.
+- Course cards redesigned to a consistent size and cleaner layout.
+- Course viewer redesigned so each lesson can have its own:
+  - title
+  - description
+  - video link / YouTube ID
+  - duration
+  - notes link
+  - PDF link
+- The old playlist-focused text was removed.
+- The text 'Admin-added courses from Firestore are shown here for students.' is no longer present.
+- Cart page redesigned.
+- Dashboard home and My Courses now read live course data and approved enrollments properly.
+- Admin course form updated to support lesson-by-lesson content management.
+
+Important Firestore course structure now expected
+courses/{courseId}
+  title
+  shortTitle
+  description
+  category
+  teacher
+  price
+  originalPrice
+  duration
+  thumbnail
+  pdfDriveLink
+  notesDriveLink
+  extraDriveLink
+  lessons: [
+    {
+      id,
+      title,
+      description,
+      duration,
+      videoUrl,
+      notesLink,
+      pdfLink
+    }
+  ]
+
+Files mostly changed
+- src/pages/DashboardLMS.jsx
+- src/components/dashboard/Sidebar.jsx
+- src/components/dashboard/TopBar.jsx
+- src/components/dashboard/CourseCard.jsx
+- src/components/dashboard/ExamCountdownWidget.jsx
+- src/components/dashboard/ScheduleNoticesWidgets.jsx
+- src/pages/dashboard/CoursesPage.jsx
+- src/pages/dashboard/DashboardHome.jsx
+- src/pages/dashboard/MyCoursesPage.jsx
+- src/pages/dashboard/CourseViewerPage.jsx
+- src/pages/dashboard/CartPage.jsx
+- src/pages/admin/AdminDashboard.jsx
+- src/styles/lms.css
+- src/utils/courseHelpers.js
+- src/global.css
+- src/index.css
+- src/App.css
+
+Note
+I could not verify a production build inside the container because Vite dependencies were not available locally.

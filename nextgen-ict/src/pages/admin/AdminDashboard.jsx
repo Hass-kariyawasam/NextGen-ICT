@@ -21,6 +21,9 @@ import {
   CheckCircle as ApproveIcon,
   Cancel as RejectIcon,
   Visibility as ViewIcon,
+  VideoLibrary as VideoIcon,
+  CloudUpload as UploadIcon,
+  PlayCircle as PlayIcon,
 } from '@mui/icons-material';
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc,
@@ -74,13 +77,13 @@ export default function AdminDashboard() {
   };
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: '#0f172a', minHeight: '100vh', p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#1e293b', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#f1f5f9', mb: 1 }}>
           Admin Dashboard
         </Typography>
-        <Typography sx={{ color: '#64748b', fontSize: '0.95rem' }}>
+        <Typography sx={{ color: '#cbd5e1', fontSize: '0.95rem' }}>
           Manage courses, students, and enrollments
         </Typography>
       </Box>
@@ -88,17 +91,17 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <Card sx={{ borderRadius: '16px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: '#EFF6FF', color: '#2563EB', width: 56, height: 56 }}>
+                <Avatar sx={{ bgcolor: '#001f5c', color: '#0052cc', width: 56, height: 56 }}>
                   <StudentsIcon />
                 </Avatar>
                 <Box>
-                  <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
                     Total Students
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
                     {stats.totalStudents}
                   </Typography>
                 </Box>
@@ -108,17 +111,17 @@ export default function AdminDashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <Card sx={{ borderRadius: '16px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: '#F0FDF4', color: '#15803D', width: 56, height: 56 }}>
+                <Avatar sx={{ bgcolor: '#001f5c', color: '#0052cc', width: 56, height: 56 }}>
                   <CoursesIcon />
                 </Avatar>
                 <Box>
-                  <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
                     Total Courses
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
                     {stats.totalCourses}
                   </Typography>
                 </Box>
@@ -128,17 +131,17 @@ export default function AdminDashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <Card sx={{ borderRadius: '16px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: '#FFF7ED', color: '#C2410C', width: 56, height: 56 }}>
+                <Avatar sx={{ bgcolor: '#5a3a00', color: '#ff8c00', width: 56, height: 56 }}>
                   <EnrollmentsIcon />
                 </Avatar>
                 <Box>
-                  <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
                     Pending Approvals
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
                     {stats.pendingEnrollments}
                   </Typography>
                 </Box>
@@ -148,17 +151,17 @@ export default function AdminDashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <Card sx={{ borderRadius: '16px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar sx={{ bgcolor: '#F0FDF4', color: '#15803D', width: 56, height: 56 }}>
+                <Avatar sx={{ bgcolor: '#001f5c', color: '#0052cc', width: 56, height: 56 }}>
                   <DashboardIcon />
                 </Avatar>
                 <Box>
-                  <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
                     Total Revenue
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
                     Rs. {stats.totalRevenue.toLocaleString()}
                   </Typography>
                 </Box>
@@ -169,25 +172,32 @@ export default function AdminDashboard() {
       </Grid>
 
       {/* Tabs */}
-      <Paper sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', mb: 3 }}>
+      <Paper sx={{ borderRadius: '16px', border: '1px solid #334155', mb: 3, bgcolor: '#1e293b' }}>
         <Tabs 
           value={activeTab} 
           onChange={(_, v) => setActiveTab(v)}
-          sx={{ borderBottom: '1px solid #e2e8f0', px: 2 }}
+          sx={{ 
+            borderBottom: '1px solid #334155', 
+            px: 2,
+            '& .MuiTabs-indicator': { bgcolor: '#0052cc' }
+          }}
+          textColor="inherit"
         >
-          <Tab label="Courses Management" icon={<CoursesIcon />} iconPosition="start" />
-          <Tab label="Enrollments" icon={<EnrollmentsIcon />} iconPosition="start" />
-          <Tab label="Students" icon={<StudentsIcon />} iconPosition="start" />
-          <Tab label="Schedule & Notices" icon={<ScheduleIcon />} iconPosition="start" />
-          <Tab label="Settings" icon={<SettingsIcon />} iconPosition="start" />
+          <Tab label="Courses Management" icon={<CoursesIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#0052cc' } }} />
+          <Tab label="Lesson Videos" icon={<VideoIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#0052cc' } }} />
+          <Tab label="Enrollments" icon={<EnrollmentsIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#ff8c00' } }} />
+          <Tab label="Students" icon={<StudentsIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#0052cc' } }} />
+          <Tab label="Schedule & Notices" icon={<ScheduleIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#ff8c00' } }} />
+          <Tab label="Settings" icon={<SettingsIcon />} iconPosition="start" sx={{ color: '#cbd5e1', '&.Mui-selected': { color: '#0052cc' } }} />
         </Tabs>
 
         <Box sx={{ p: 3 }}>
           {activeTab === 0 && <CoursesManagement onUpdate={fetchStats} />}
-          {activeTab === 1 && <EnrollmentsManagement onUpdate={fetchStats} />}
-          {activeTab === 2 && <StudentsManagement />}
-          {activeTab === 3 && <ScheduleNoticesManagement />}
-          {activeTab === 4 && <ExamSettings />}
+          {activeTab === 1 && <LessonVideosManagement />}
+          {activeTab === 2 && <EnrollmentsManagement onUpdate={fetchStats} />}
+          {activeTab === 3 && <StudentsManagement />}
+          {activeTab === 4 && <ScheduleNoticesManagement />}
+          {activeTab === 5 && <ExamSettings />}
         </Box>
       </Paper>
     </Box>
@@ -195,7 +205,18 @@ export default function AdminDashboard() {
 }
 
 // ===== COURSES MANAGEMENT COMPONENT =====
+
 function CoursesManagement({ onUpdate }) {
+  const emptyLesson = () => ({
+    id: `lesson-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    title: '',
+    description: '',
+    duration: '',
+    videoUrl: '',
+    notesLink: '',
+    pdfLink: ''
+  });
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -211,9 +232,10 @@ function CoursesManagement({ onUpdate }) {
     totalLessons: 0,
     duration: '',
     thumbnail: '',
-    youtubePlaylistId: '',
     pdfDriveLink: '',
-    notesDriveLink: ''
+    notesDriveLink: '',
+    extraDriveLink: '',
+    lessons: [emptyLesson()]
   });
 
   useEffect(() => {
@@ -231,16 +253,52 @@ function CoursesManagement({ onUpdate }) {
     setLoading(false);
   };
 
+  const handleLessonChange = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessons: prev.lessons.map((lesson, lessonIndex) =>
+        lessonIndex === index ? { ...lesson, [field]: value } : lesson
+      )
+    }));
+  };
+
+  const addLesson = () => {
+    setFormData((prev) => ({ ...prev, lessons: [...prev.lessons, emptyLesson()] }));
+  };
+
+  const removeLesson = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessons: prev.lessons.filter((_, lessonIndex) => lessonIndex !== index)
+    }));
+  };
+
   const handleSave = async () => {
     try {
+      const cleanedLessons = (formData.lessons || [])
+        .map((lesson, index) => ({
+          id: lesson.id || `lesson-${index + 1}`,
+          title: lesson.title?.trim() || `Lesson ${index + 1}`,
+          description: lesson.description?.trim() || '',
+          duration: lesson.duration?.trim() || '',
+          videoUrl: lesson.videoUrl?.trim() || '',
+          notesLink: lesson.notesLink?.trim() || '',
+          pdfLink: lesson.pdfLink?.trim() || ''
+        }))
+        .filter((lesson) => lesson.title || lesson.videoUrl || lesson.description);
+
+      const payload = {
+        ...formData,
+        totalLessons: cleanedLessons.length,
+        lessons: cleanedLessons,
+        updatedAt: serverTimestamp()
+      };
+
       if (editCourse) {
-        await updateDoc(doc(db, 'courses', editCourse.id), {
-          ...formData,
-          updatedAt: serverTimestamp()
-        });
+        await updateDoc(doc(db, 'courses', editCourse.id), payload);
       } else {
         await addDoc(collection(db, 'courses'), {
-          ...formData,
+          ...payload,
           rating: 0,
           students: 0,
           createdAt: serverTimestamp()
@@ -281,9 +339,20 @@ function CoursesManagement({ onUpdate }) {
       totalLessons: course.totalLessons || 0,
       duration: course.duration || '',
       thumbnail: course.thumbnail || '',
-      youtubePlaylistId: course.youtubePlaylistId || '',
       pdfDriveLink: course.pdfDriveLink || '',
-      notesDriveLink: course.notesDriveLink || ''
+      notesDriveLink: course.notesDriveLink || '',
+      extraDriveLink: course.extraDriveLink || '',
+      lessons: Array.isArray(course.lessons) && course.lessons.length
+        ? course.lessons.map((lesson, index) => ({
+            id: lesson.id || `lesson-${index + 1}`,
+            title: lesson.title || '',
+            description: lesson.description || '',
+            duration: lesson.duration || '',
+            videoUrl: lesson.videoUrl || lesson.youtubeLink || lesson.youtubeUrl || lesson.youtubeId || '',
+            notesLink: lesson.notesLink || '',
+            pdfLink: lesson.pdfLink || ''
+          }))
+        : [emptyLesson()]
     });
     setDialogOpen(true);
   };
@@ -300,18 +369,19 @@ function CoursesManagement({ onUpdate }) {
       totalLessons: 0,
       duration: '',
       thumbnail: '',
-      youtubePlaylistId: '',
       pdfDriveLink: '',
-      notesDriveLink: ''
+      notesDriveLink: '',
+      extraDriveLink: '',
+      lessons: [emptyLesson()]
     });
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress sx={{ color: '#ff8c00' }} />;
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
           Manage Courses ({courses.length})
         </Typography>
         <Button
@@ -322,62 +392,51 @@ function CoursesManagement({ onUpdate }) {
             resetForm();
             setDialogOpen(true);
           }}
-          sx={{ borderRadius: '10px', textTransform: 'none' }}
+          sx={{ borderRadius: '10px', textTransform: 'none', bgcolor: '#ff8c00', '&:hover': { bgcolor: '#e67e00' } }}
         >
           Add New Course
         </Button>
       </Box>
 
-      <TableContainer>
+      <TableContainer sx={{ bgcolor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Course</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Teacher</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Price</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Students</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+            <TableRow sx={{ bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Course</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Category</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Teacher</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Price</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Lessons</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {courses.map(course => (
-              <TableRow key={course.id}>
-                <TableCell>
+              <TableRow key={course.id} sx={{ borderBottom: '1px solid #334155', '&:hover': { bgcolor: '#263449' } }}>
+                <TableCell sx={{ color: '#cbd5e1' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar src={course.thumbnail} variant="rounded" />
                     <Box>
-                      <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: '#f1f5f9' }}>
                         {course.title}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        {course.totalLessons} lessons • {course.duration}
+                      <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                        {course.duration || 'Flexible duration'}
                       </Typography>
                     </Box>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Chip label={course.category} size="small" />
+                <TableCell sx={{ color: '#cbd5e1' }}><Chip label={course.category} size="small" sx={{ bgcolor: '#001f5c', color: '#0052cc', fontWeight: 600 }} /></TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>{course.teacher}</TableCell>
+                <TableCell sx={{ color: '#f1f5f9' }}>
+                  <Typography sx={{ fontWeight: 700 }}>Rs. {Number(course.price || 0).toLocaleString()}</Typography>
                 </TableCell>
-                <TableCell>{course.teacher}</TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>{course.lessons?.length || course.totalLessons || 0}</TableCell>
                 <TableCell>
-                  <Box>
-                    <Typography sx={{ fontWeight: 700 }}>
-                      Rs. {course.price?.toLocaleString()}
-                    </Typography>
-                    {course.originalPrice > course.price && (
-                      <Typography sx={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'line-through' }}>
-                        Rs. {course.originalPrice?.toLocaleString()}
-                      </Typography>
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>{course.students || 0}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleEdit(course)} color="primary" size="small">
+                  <IconButton onClick={() => handleEdit(course)} sx={{ color: '#0052cc' }} size="small">
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(course.id)} color="error" size="small">
+                  <IconButton onClick={() => handleDelete(course.id)} sx={{ color: '#ef4444' }} size="small">
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -387,141 +446,480 @@ function CoursesManagement({ onUpdate }) {
         </Table>
       </TableContainer>
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{editCourse ? 'Edit Course' : 'Add New Course'}</DialogTitle>
-        <DialogContent>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f1f5f9', bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>
+          {editCourse ? 'Edit Course' : 'Add New Course'}
+        </DialogTitle>
+        <DialogContent sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>
+          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Course Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} 
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField fullWidth label="Short Title" value={formData.shortTitle} onChange={e => setFormData({ ...formData, shortTitle: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } }}>Category</InputLabel>
+                <Select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} label="Category"
+                  sx={{ color: '#f1f5f9', bgcolor: '#263449', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#334155' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#475569' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#ff8c00' } }}
+                >
+                  <MenuItem value="Theory" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Theory</MenuItem>
+                  <MenuItem value="Programming" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Programming</MenuItem>
+                  <MenuItem value="Web" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Web Development</MenuItem>
+                  <MenuItem value="Database" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Database</MenuItem>
+                  <MenuItem value="Networking" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Networking</MenuItem>
+                  <MenuItem value="Free" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Free</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth multiline rows={3} label="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField fullWidth label="Teacher Name" value={formData.teacher} onChange={e => setFormData({ ...formData, teacher: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField fullWidth label="Duration" value={formData.duration} onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth type="number" label="Price" value={formData.price} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth type="number" label="Original Price" value={formData.originalPrice} onChange={e => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth label="Thumbnail URL" value={formData.thumbnail} onChange={e => setFormData({ ...formData, thumbnail: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth label="Course PDF Link" value={formData.pdfDriveLink} onChange={e => setFormData({ ...formData, pdfDriveLink: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth label="Course Notes Link" value={formData.notesDriveLink} onChange={e => setFormData({ ...formData, notesDriveLink: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth label="Extra Drive Link" value={formData.extraDriveLink} onChange={e => setFormData({ ...formData, extraDriveLink: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 1, borderColor: '#334155' }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography sx={{ fontWeight: 700, color: '#f1f5f9' }}>Lesson Manager</Typography>
+                <Button variant="outlined" onClick={addLesson} sx={{ textTransform: 'none', borderColor: '#334155', color: '#ff8c00', '&:hover': { borderColor: '#ff8c00', bgcolor: 'transparent' } }}>Add Lesson</Button>
+              </Box>
+            </Grid>
+
+            {formData.lessons.map((lesson, index) => (
+              <Grid item xs={12} key={lesson.id}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: '16px', bgcolor: '#0f172a', borderColor: '#334155' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography sx={{ fontWeight: 700, color: '#f1f5f9' }}>Lesson {index + 1}</Typography>
+                    {formData.lessons.length > 1 && (
+                      <Button color="error" onClick={() => removeLesson(index)} sx={{ textTransform: 'none', color: '#ef4444' }}>
+                        Remove
+                      </Button>
+                    )}
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TextField fullWidth label="Lesson Title" value={lesson.title} onChange={e => handleLessonChange(index, 'title', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField fullWidth label="Duration" value={lesson.duration} onChange={e => handleLessonChange(index, 'duration', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField fullWidth multiline rows={2} label="Lesson Description" value={lesson.description} onChange={e => handleLessonChange(index, 'description', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField fullWidth label="Lesson Video Link or YouTube ID" value={lesson.videoUrl} onChange={e => handleLessonChange(index, 'videoUrl', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField fullWidth label="Lesson Notes Link" value={lesson.notesLink} onChange={e => handleLessonChange(index, 'notesLink', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField fullWidth label="Lesson PDF Link" value={lesson.pdfLink} onChange={e => handleLessonChange(index, 'pdfLink', e.target.value)}
+                        InputProps={{ sx: { color: '#f1f5f9' } }}
+                        InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ bgcolor: '#0f172a', borderTop: '1px solid #334155', p: 2 }}>
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: '#cbd5e1', '&:hover': { bgcolor: '#263449' } }}>Cancel</Button>
+          <Button variant="contained" onClick={handleSave} sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}>{editCourse ? 'Update' : 'Create'}</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+}
+
+
+// ===== LESSON VIDEOS MANAGEMENT COMPONENT =====
+function LessonVideosManagement() {
+  const [courses, setCourses] = useState([]);
+  const [expandedCourse, setExpandedCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [videoDialog, setVideoDialog] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [videoForm, setVideoForm] = useState({
+    videoUrl: '',
+    videoTitle: ''
+  });
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const snap = await getDocs(collection(db, 'courses'));
+      setCourses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleEditLesson = (course, lesson) => {
+    setSelectedCourseId(course.id);
+    setSelectedLesson(lesson);
+    setVideoForm({
+      videoUrl: lesson.videoUrl || '',
+      videoTitle: lesson.title || ''
+    });
+    setVideoDialog(true);
+  };
+
+  const handleSaveVideo = async () => {
+    if (!selectedCourseId || !selectedLesson) return;
+
+    try {
+      const course = courses.find(c => c.id === selectedCourseId);
+      const updatedLessons = (course.lessons || []).map(l =>
+        l.id === selectedLesson.id
+          ? { ...l, videoUrl: videoForm.videoUrl, title: videoForm.videoTitle }
+          : l
+      );
+
+      await updateDoc(doc(db, 'courses', selectedCourseId), {
+        lessons: updatedLessons,
+        updatedAt: serverTimestamp()
+      });
+
+      setVideoDialog(false);
+      setSelectedLesson(null);
+      setSelectedCourseId(null);
+      setVideoForm({ videoUrl: '', videoTitle: '' });
+      fetchCourses();
+    } catch (error) {
+      console.error('Error updating video:', error);
+    }
+  };
+
+  if (loading) return <CircularProgress sx={{ color: '#0052cc' }} />;
+
+  return (
+    <Box>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9', mb: 3 }}>
+        Manage Lesson Videos ({courses.length} Courses)
+      </Typography>
+
+      <Paper sx={{ borderRadius: '12px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
+        {courses.map(course => (
+          <Box key={course.id}>
+            <Box
+              onClick={() => setExpandedCourse(expandedCourse === course.id ? null : course.id)}
+              sx={{
+                p: 2,
+                bgcolor: '#0f172a',
+                borderBottom: '1px solid #334155',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                '&:hover': { bgcolor: '#1a1f3a' },
+                transition: 'all 0.3s'
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {course.thumbnail && (
+                  <img
+                    src={course.thumbnail}
+                    alt={course.title}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 8,
+                      objectFit: 'cover',
+                      border: '2px solid #334155'
+                    }}
+                  />
+                )}
+                <Box>
+                  <Typography sx={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>
+                    {course.title}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                    {course.lessons?.length || 0} Lessons
+                  </Typography>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Chip
+                  label={course.category}
+                  size="small"
+                  sx={{
+                    bgcolor: '#001f5c',
+                    color: '#0052cc',
+                    fontWeight: 600
+                  }}
+                />
+                <PlayIcon sx={{ color: '#ff8c00', fontSize: 28 }} />
+              </Box>
+            </Box>
+
+            {expandedCourse === course.id && (
+              <Box sx={{ p: 2 }}>
+                {course.lessons && course.lessons.length > 0 ? (
+                  <Grid container spacing={2}>
+                    {course.lessons.map((lesson, idx) => (
+                      <Grid item xs={12} key={lesson.id}>
+                        <Paper
+                          sx={{
+                            p: 2,
+                            bgcolor: '#263449',
+                            border: '1px solid #334155',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            '&:hover': { borderColor: '#0052cc', boxShadow: '0 0 10px rgba(0, 82, 204, 0.2)' },
+                            transition: 'all 0.3s'
+                          }}
+                        >
+                          <Box>
+                            <Typography sx={{ fontWeight: 600, color: '#f1f5f9', mb: 0.5 }}>
+                              Lesson {idx + 1}: {lesson.title}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                              {lesson.videoUrl ? (
+                                <>
+                                  <Chip
+                                    icon={<PlayIcon />}
+                                    label="Video Available"
+                                    size="small"
+                                    sx={{
+                                      bgcolor: '#001f5c',
+                                      color: '#0052cc',
+                                      fontWeight: 600
+                                    }}
+                                  />
+                                  <Typography sx={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                    {lesson.videoUrl.includes('youtube') ? '🎬 YouTube' : '📹 Video Link'}
+                                  </Typography>
+                                </>
+                              ) : (
+                                <Chip
+                                  label="No Video"
+                                  size="small"
+                                  sx={{
+                                    bgcolor: '#3a2a2a',
+                                    color: '#cbd5e1'
+                                  }}
+                                />
+                              )}
+                              {lesson.duration && (
+                                <Typography sx={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                                  ⏱️ {lesson.duration}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+                          <Button
+                            variant="contained"
+                            startIcon={<UploadIcon />}
+                            onClick={() => handleEditLesson(course, lesson)}
+                            sx={{
+                              bgcolor: '#0052cc',
+                              color: '#f1f5f9',
+                              '&:hover': { bgcolor: '#0041a3' },
+                              textTransform: 'none',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Update Video
+                          </Button>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Alert severity="warning" sx={{
+                    bgcolor: '#5a3a00',
+                    color: '#ff8c00',
+                    '& .MuiAlert-icon': { color: '#ff8c00' }
+                  }}>
+                    No lessons added yet for this course
+                  </Alert>
+                )}
+              </Box>
+            )}
+          </Box>
+        ))}
+      </Paper>
+
+      {/* Video Upload Dialog */}
+      <Dialog open={videoDialog} onClose={() => setVideoDialog(false)} maxWidth="sm" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f1f5f9', bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>
+          Update Lesson Video
+        </DialogTitle>
+        <DialogContent sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <Typography sx={{ fontSize: '0.9rem', color: '#cbd5e1', mb: 1 }}>
+                Lesson: <strong>{selectedLesson?.title}</strong>
+              </Typography>
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Course Title"
-                value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
+                label="Lesson Title"
+                value={videoForm.videoTitle}
+                onChange={e => setVideoForm({ ...videoForm, videoTitle: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#0052cc' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#0052cc' } } }}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Short Title"
-                value={formData.shortTitle}
-                onChange={e => setFormData({ ...formData, shortTitle: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Category</InputLabel>
-                <Select
-                  value={formData.category}
-                  onChange={e => setFormData({ ...formData, category: e.target.value })}
-                  label="Category"
-                >
-                  <MenuItem value="Theory">Theory</MenuItem>
-                  <MenuItem value="Programming">Programming</MenuItem>
-                  <MenuItem value="Web">Web Development</MenuItem>
-                  <MenuItem value="Database">Database</MenuItem>
-                  <MenuItem value="Networking">Networking</MenuItem>
-                  <MenuItem value="Free">Free</MenuItem>
-                </Select>
-              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 multiline
                 rows={3}
-                label="Description"
-                value={formData.description}
-                onChange={e => setFormData({ ...formData, description: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Teacher Name"
-                value={formData.teacher}
-                onChange={e => setFormData({ ...formData, teacher: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Duration (e.g., 48 hours)"
-                value={formData.duration}
-                onChange={e => setFormData({ ...formData, duration: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Price (Rs.)"
-                value={formData.price}
-                onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Original Price (Rs.)"
-                value={formData.originalPrice}
-                onChange={e => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Total Lessons"
-                value={formData.totalLessons}
-                onChange={e => setFormData({ ...formData, totalLessons: Number(e.target.value) })}
+                label="Video URL or YouTube Link"
+                placeholder="e.g., https://www.youtube.com/watch?v=... or your video link"
+                value={videoForm.videoUrl}
+                onChange={e => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#0052cc' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#0052cc' } } }}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Thumbnail URL"
-                value={formData.thumbnail}
-                onChange={e => setFormData({ ...formData, thumbnail: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="YouTube Playlist ID"
-                value={formData.youtubePlaylistId}
-                onChange={e => setFormData({ ...formData, youtubePlaylistId: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="PDF Drive Link"
-                value={formData.pdfDriveLink}
-                onChange={e => setFormData({ ...formData, pdfDriveLink: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Notes Drive Link"
-                value={formData.notesDriveLink}
-                onChange={e => setFormData({ ...formData, notesDriveLink: e.target.value })}
-              />
+              <Alert severity="info" sx={{
+                bgcolor: '#001f5c',
+                color: '#0052cc',
+                '& .MuiAlert-icon': { color: '#0052cc' },
+                fontSize: '0.85rem'
+              }}>
+                💡 Tip: Paste YouTube URL or any video hosting link (Google Drive, Vimeo, etc.)
+              </Alert>
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSave}>
-            {editCourse ? 'Update' : 'Create'}
+        <DialogActions sx={{ bgcolor: '#0f172a', borderTop: '1px solid #334155', p: 2 }}>
+          <Button onClick={() => setVideoDialog(false)} sx={{ color: '#cbd5e1', '&:hover': { bgcolor: '#263449' } }}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveVideo}
+            sx={{
+              bgcolor: '#0052cc',
+              color: '#f1f5f9',
+              '&:hover': { bgcolor: '#0041a3' }
+            }}
+          >
+            Save Video
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
 }
+
 
 // ===== ENROLLMENTS MANAGEMENT =====
 function EnrollmentsManagement({ onUpdate }) {
@@ -586,46 +984,48 @@ function EnrollmentsManagement({ onUpdate }) {
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress sx={{ color: '#ff8c00' }} />;
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
           Enrollments ({enrollments.length})
         </Typography>
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <Select value={filter} onChange={e => setFilter(e.target.value)}>
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="approved">Approved</MenuItem>
-            <MenuItem value="rejected">Rejected</MenuItem>
+          <Select value={filter} onChange={e => setFilter(e.target.value)}
+            sx={{ color: '#f1f5f9', bgcolor: '#1e293b', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#334155' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#475569' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#ff8c00' }, '& .MuiSvgIcon-root': { color: '#f1f5f9' } }}
+          >
+            <MenuItem value="all" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>All</MenuItem>
+            <MenuItem value="pending" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Pending</MenuItem>
+            <MenuItem value="approved" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Approved</MenuItem>
+            <MenuItem value="rejected" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Rejected</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      <TableContainer>
+      <TableContainer sx={{ bgcolor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Course</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Student ID</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Price</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Payment Slip</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+            <TableRow sx={{ bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Course</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Student ID</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Price</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Payment Slip</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {enrollments.map(enrollment => (
-              <TableRow key={enrollment.id}>
-                <TableCell>{enrollment.courseTitle}</TableCell>
-                <TableCell>
-                  <Typography sx={{ fontSize: '0.85rem', fontFamily: 'monospace' }}>
+              <TableRow key={enrollment.id} sx={{ borderBottom: '1px solid #334155', '&:hover': { bgcolor: '#263449' } }}>
+                <TableCell sx={{ color: '#cbd5e1' }}>{enrollment.courseTitle}</TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>
+                  <Typography sx={{ fontSize: '0.85rem', fontFamily: 'monospace', color: '#f1f5f9' }}>
                     {enrollment.userId?.slice(0, 12)}...
                   </Typography>
                 </TableCell>
-                <TableCell>Rs. {enrollment.price?.toLocaleString()}</TableCell>
+                <TableCell sx={{ color: '#f1f5f9', fontWeight: 700 }}>Rs. {enrollment.price?.toLocaleString()}</TableCell>
                 <TableCell>
                   <Chip
                     label={enrollment.status}
@@ -634,6 +1034,11 @@ function EnrollmentsManagement({ onUpdate }) {
                       enrollment.status === 'pending' ? 'warning' : 'error'
                     }
                     size="small"
+                    sx={{
+                      bgcolor: enrollment.status === 'approved' ? '#064e3b' : enrollment.status === 'pending' ? '#78350f' : '#7f1d1d',
+                      color: enrollment.status === 'approved' ? '#86efac' : enrollment.status === 'pending' ? '#fcd34d' : '#fca5a5',
+                      fontWeight: 600
+                    }}
                   />
                 </TableCell>
                 <TableCell>
@@ -643,11 +1048,12 @@ function EnrollmentsManagement({ onUpdate }) {
                       startIcon={<ViewIcon />}
                       href={enrollment.slipLink}
                       target="_blank"
+                      sx={{ color: '#0052cc', textTransform: 'none' }}
                     >
                       View
                     </Button>
                   ) : (
-                    <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                    <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8' }}>
                       No slip
                     </Typography>
                   )}
@@ -655,15 +1061,15 @@ function EnrollmentsManagement({ onUpdate }) {
                 <TableCell>
                   {enrollment.status === 'pending' && (
                     <>
-                      <IconButton onClick={() => handleApprove(enrollment.id)} color="success" size="small">
+                      <IconButton onClick={() => handleApprove(enrollment.id)} sx={{ color: '#0052cc' }} size="small">
                         <ApproveIcon fontSize="small" />
                       </IconButton>
-                      <IconButton onClick={() => handleReject(enrollment.id)} color="error" size="small">
+                      <IconButton onClick={() => handleReject(enrollment.id)} sx={{ color: '#ef4444' }} size="small">
                         <RejectIcon fontSize="small" />
                       </IconButton>
                     </>
                   )}
-                  <IconButton onClick={() => handleRemove(enrollment.id)} color="error" size="small">
+                  <IconButton onClick={() => handleRemove(enrollment.id)} sx={{ color: '#ef4444' }} size="small">
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -729,12 +1135,12 @@ function StudentsManagement() {
     s.studentId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress sx={{ color: '#ff8c00' }} />;
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
           Students ({students.length})
         </Typography>
         <TextField
@@ -742,38 +1148,44 @@ function StudentsManagement() {
           placeholder="Search students..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          sx={{ width: 300 }}
+          sx={{ width: 300, '& .MuiOutlinedInput-root': { color: '#f1f5f9', borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } }, '& .MuiOutlinedInput-input::placeholder': { color: '#94a3b8', opacity: 0.7 } }}
+          InputProps={{
+            sx: { color: '#f1f5f9' }
+          }}
         />
       </Box>
 
-      <TableContainer>
+      <TableContainer sx={{ bgcolor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Student ID</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Phone</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Center</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+            <TableRow sx={{ bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Email</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Student ID</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Phone</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Center</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: '#f1f5f9' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredStudents.map(student => (
-              <TableRow key={student.id}>
-                <TableCell>{student.name}</TableCell>
-                <TableCell>{student.email}</TableCell>
-                <TableCell>{student.studentId || 'N/A'}</TableCell>
-                <TableCell>{student.phone || 'N/A'}</TableCell>
+              <TableRow key={student.id} sx={{ borderBottom: '1px solid #334155', '&:hover': { bgcolor: '#263449' } }}>
+                <TableCell sx={{ color: '#f1f5f9' }}>{student.name}</TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>{student.email}</TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>{student.studentId || 'N/A'}</TableCell>
+                <TableCell sx={{ color: '#cbd5e1' }}>{student.phone || 'N/A'}</TableCell>
                 <TableCell>
                   <Chip
                     label={student.center || 'online'}
                     size="small"
-                    color={student.center === 'physical' ? 'primary' : 'default'}
+                    sx={{
+                      bgcolor: student.center === 'physical' ? '#001f5c' : '#001f5c',
+                      color: student.center === 'physical' ? '#0052cc' : '#0052cc'
+                    }}
                   />
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleEdit(student)} color="primary" size="small">
+                  <IconButton onClick={() => handleEdit(student)} sx={{ color: '#0052cc' }} size="small">
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -784,9 +1196,16 @@ function StudentsManagement() {
       </TableContainer>
 
       {/* Edit Student Dialog */}
-      <Dialog open={editDialog} onClose={() => setEditDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Student</DialogTitle>
-        <DialogContent>
+      <Dialog open={editDialog} onClose={() => setEditDialog(false)} maxWidth="sm" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f1f5f9', bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>Edit Student</DialogTitle>
+        <DialogContent sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>
           {selectedStudent && (
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12}>
@@ -795,6 +1214,9 @@ function StudentsManagement() {
                   label="Name"
                   value={selectedStudent.name || ''}
                   onChange={e => setSelectedStudent({ ...selectedStudent, name: e.target.value })}
+                  InputProps={{ sx: { color: '#f1f5f9' } }}
+                  InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                  sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -803,6 +1225,9 @@ function StudentsManagement() {
                   label="Email"
                   value={selectedStudent.email || ''}
                   onChange={e => setSelectedStudent({ ...selectedStudent, email: e.target.value })}
+                  InputProps={{ sx: { color: '#f1f5f9' } }}
+                  InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                  sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -811,6 +1236,9 @@ function StudentsManagement() {
                   label="Student ID"
                   value={selectedStudent.studentId || ''}
                   onChange={e => setSelectedStudent({ ...selectedStudent, studentId: e.target.value })}
+                  InputProps={{ sx: { color: '#f1f5f9' } }}
+                  InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                  sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -819,27 +1247,31 @@ function StudentsManagement() {
                   label="WhatsApp Number"
                   value={selectedStudent.phone || ''}
                   onChange={e => setSelectedStudent({ ...selectedStudent, phone: e.target.value })}
+                  InputProps={{ sx: { color: '#f1f5f9' } }}
+                  InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                  sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Class Type</InputLabel>
+                  <InputLabel sx={{ color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } }}>Class Type</InputLabel>
                   <Select
                     value={selectedStudent.center || 'online'}
                     onChange={e => setSelectedStudent({ ...selectedStudent, center: e.target.value })}
                     label="Class Type"
+                    sx={{ color: '#f1f5f9', bgcolor: '#263449', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#334155' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#475569' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#ff8c00' } }}
                   >
-                    <MenuItem value="physical">Physical (Galle)</MenuItem>
-                    <MenuItem value="online">Online</MenuItem>
+                    <MenuItem value="physical" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Physical (Galle)</MenuItem>
+                    <MenuItem value="online" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Online</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
             </Grid>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveStudent}>Save</Button>
+        <DialogActions sx={{ bgcolor: '#0f172a', borderTop: '1px solid #334155', p: 2 }}>
+          <Button onClick={() => setEditDialog(false)} sx={{ color: '#cbd5e1', '&:hover': { bgcolor: '#263449' } }}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveStudent} sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>
@@ -941,7 +1373,7 @@ function ScheduleNoticesManagement() {
         {/* Schedules */}
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
               Upcoming Schedule
             </Typography>
             <Button
@@ -949,21 +1381,22 @@ function ScheduleNoticesManagement() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => setDialogOpen(true)}
+              sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}
             >
               Add
             </Button>
           </Box>
-          <Paper sx={{ p: 2, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <Paper sx={{ p: 2, borderRadius: '12px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             {schedules.map(schedule => (
-              <Box key={schedule.id} sx={{ mb: 2, pb: 2, borderBottom: '1px solid #f1f5f9' }}>
+              <Box key={schedule.id} sx={{ mb: 2, pb: 2, borderBottom: '1px solid #334155' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography sx={{ fontWeight: 600 }}>{schedule.title}</Typography>
-                    <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
+                    <Typography sx={{ fontWeight: 600, color: '#f1f5f9' }}>{schedule.title}</Typography>
+                    <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8' }}>
                       {schedule.date} • {schedule.time}
                     </Typography>
                   </Box>
-                  <IconButton onClick={() => handleDeleteSchedule(schedule.id)} size="small" color="error">
+                  <IconButton onClick={() => handleDeleteSchedule(schedule.id)} size="small" sx={{ color: '#ef4444' }}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Box>
@@ -975,7 +1408,7 @@ function ScheduleNoticesManagement() {
         {/* Notices */}
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#f1f5f9' }}>
               Notices
             </Typography>
             <Button
@@ -983,18 +1416,23 @@ function ScheduleNoticesManagement() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => setNoticeDialogOpen(true)}
+              sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}
             >
               Add
             </Button>
           </Box>
-          <Paper sx={{ p: 2, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <Paper sx={{ p: 2, borderRadius: '12px', border: '1px solid #334155', bgcolor: '#1e293b' }}>
             {notices.map(notice => (
               <Alert
                 key={notice.id}
                 severity={notice.type}
-                sx={{ mb: 2 }}
+                sx={{ 
+                  mb: 2,
+                  bgcolor: notice.type === 'info' ? '#1e3a5f' : notice.type === 'success' ? '#1e3a2f' : notice.type === 'warning' ? '#3a2f1e' : '#3a1f1f',
+                  color: notice.type === 'info' ? '#60a5fa' : notice.type === 'success' ? '#4ade80' : notice.type === 'warning' ? '#fbbf24' : '#ef4444'
+                }}
                 action={
-                  <IconButton onClick={() => handleDeleteNotice(notice.id)} size="small">
+                  <IconButton onClick={() => handleDeleteNotice(notice.id)} size="small" sx={{ color: 'inherit' }}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 }
@@ -1012,9 +1450,16 @@ function ScheduleNoticesManagement() {
       </Grid>
 
       {/* Schedule Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Schedule</DialogTitle>
-        <DialogContent>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f1f5f9', bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>Add Schedule</DialogTitle>
+        <DialogContent sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
@@ -1022,6 +1467,9 @@ function ScheduleNoticesManagement() {
                 label="Title"
                 value={scheduleForm.title}
                 onChange={e => setScheduleForm({ ...scheduleForm, title: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -1032,6 +1480,9 @@ function ScheduleNoticesManagement() {
                 InputLabelProps={{ shrink: true }}
                 value={scheduleForm.date}
                 onChange={e => setScheduleForm({ ...scheduleForm, date: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                inputProps={{ sx: { color: '#f1f5f9' } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -1042,19 +1493,23 @@ function ScheduleNoticesManagement() {
                 InputLabelProps={{ shrink: true }}
                 value={scheduleForm.time}
                 onChange={e => setScheduleForm({ ...scheduleForm, time: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                inputProps={{ sx: { color: '#f1f5f9' } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel>Type</InputLabel>
+                <InputLabel sx={{ color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } }}>Type</InputLabel>
                 <Select
                   value={scheduleForm.type}
                   onChange={e => setScheduleForm({ ...scheduleForm, type: e.target.value })}
                   label="Type"
+                  sx={{ color: '#f1f5f9', bgcolor: '#263449', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#334155' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#475569' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#ff8c00' } }}
                 >
-                  <MenuItem value="live">Live Class</MenuItem>
-                  <MenuItem value="practical">Practical</MenuItem>
-                  <MenuItem value="exam">Exam</MenuItem>
+                  <MenuItem value="live" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Live Class</MenuItem>
+                  <MenuItem value="practical" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Practical</MenuItem>
+                  <MenuItem value="exam" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Exam</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1064,20 +1519,30 @@ function ScheduleNoticesManagement() {
                 label="Course"
                 value={scheduleForm.course}
                 onChange={e => setScheduleForm({ ...scheduleForm, course: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveSchedule}>Save</Button>
+        <DialogActions sx={{ bgcolor: '#0f172a', borderTop: '1px solid #334155', p: 2 }}>
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: '#cbd5e1', '&:hover': { bgcolor: '#263449' } }}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveSchedule} sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}>Save</Button>
         </DialogActions>
       </Dialog>
 
       {/* Notice Dialog */}
-      <Dialog open={noticeDialogOpen} onClose={() => setNoticeDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Notice</DialogTitle>
-        <DialogContent>
+      <Dialog open={noticeDialogOpen} onClose={() => setNoticeDialogOpen(false)} maxWidth="sm" fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#f1f5f9', bgcolor: '#0f172a', borderBottom: '1px solid #334155' }}>Add Notice</DialogTitle>
+        <DialogContent sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
@@ -1085,6 +1550,9 @@ function ScheduleNoticesManagement() {
                 label="Title"
                 value={noticeForm.title}
                 onChange={e => setNoticeForm({ ...noticeForm, title: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -1095,28 +1563,32 @@ function ScheduleNoticesManagement() {
                 label="Message"
                 value={noticeForm.message}
                 onChange={e => setNoticeForm({ ...noticeForm, message: e.target.value })}
+                InputProps={{ sx: { color: '#f1f5f9' } }}
+                InputLabelProps={{ sx: { color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Type</InputLabel>
+                <InputLabel sx={{ color: '#cbd5e1', '&.Mui-focused': { color: '#ff8c00' } }}>Type</InputLabel>
                 <Select
                   value={noticeForm.type}
                   onChange={e => setNoticeForm({ ...noticeForm, type: e.target.value })}
                   label="Type"
+                  sx={{ color: '#f1f5f9', bgcolor: '#263449', '& .MuiOutlinedInput-notchedOutline': { borderColor: '#334155' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#475569' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#ff8c00' } }}
                 >
-                  <MenuItem value="info">Info</MenuItem>
-                  <MenuItem value="success">Success</MenuItem>
-                  <MenuItem value="warning">Warning</MenuItem>
-                  <MenuItem value="error">Error</MenuItem>
+                  <MenuItem value="info" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Info</MenuItem>
+                  <MenuItem value="success" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Success</MenuItem>
+                  <MenuItem value="warning" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Warning</MenuItem>
+                  <MenuItem value="error" sx={{ bgcolor: '#1e293b', color: '#f1f5f9' }}>Error</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setNoticeDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveNotice}>Save</Button>
+        <DialogActions sx={{ bgcolor: '#0f172a', borderTop: '1px solid #334155', p: 2 }}>
+          <Button onClick={() => setNoticeDialogOpen(false)} sx={{ color: '#cbd5e1', '&:hover': { bgcolor: '#263449' } }}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveNotice} sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' } }}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>
@@ -1172,12 +1644,12 @@ function ExamSettings() {
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, color: '#f1f5f9' }}>
         Exam Settings
       </Typography>
 
-      <Paper sx={{ p: 3, borderRadius: '12px', border: '1px solid #e2e8f0', maxWidth: 500 }}>
-        <Typography sx={{ mb: 2, fontWeight: 600 }}>
+      <Paper sx={{ p: 3, borderRadius: '12px', border: '1px solid #334155', bgcolor: '#1e293b', maxWidth: 500 }}>
+        <Typography sx={{ mb: 2, fontWeight: 600, color: '#f1f5f9' }}>
           A/L Exam Date
         </Typography>
         <TextField
@@ -1185,11 +1657,17 @@ function ExamSettings() {
           type="date"
           value={examDate}
           onChange={e => setExamDate(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, '& .MuiOutlinedInput-root': { color: '#f1f5f9', borderColor: '#334155', '&:hover fieldset': { borderColor: '#475569' }, '&.Mui-focused fieldset': { borderColor: '#ff8c00' } } }}
+          InputProps={{ sx: { color: '#f1f5f9' } }}
         />
         
         {daysUntilExam > 0 && (
-          <Alert severity="info" sx={{ mb: 2 }}>
+          <Alert severity="info" sx={{ 
+            mb: 2,
+            bgcolor: '#001f5c',
+            color: '#0052cc',
+            '& .MuiAlert-icon': { color: '#0052cc' }
+          }}>
             {daysUntilExam} days remaining until the exam
           </Alert>
         )}
@@ -1199,6 +1677,7 @@ function ExamSettings() {
           onClick={handleSave}
           disabled={loading}
           fullWidth
+          sx={{ bgcolor: '#ff8c00', color: '#0f172a', '&:hover': { bgcolor: '#e67e00' }, '&.Mui-disabled': { bgcolor: '#475569', color: '#94a3b8' } }}
         >
           {loading ? 'Saving...' : 'Save Exam Date'}
         </Button>

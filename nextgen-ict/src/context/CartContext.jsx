@@ -51,11 +51,50 @@ export function CartProvider({ children }) {
     await fetchEnrollments();
   };
 
+  const submitPayment = async (slipLink, description) => {
+    if (!user || cart.length === 0) throw new Error('Invalid submission');
+
+    const orderDoc = await addDoc(collection(db, "orders"), {
+      userId:      user.uid,
+      courseCount: cart.length,
+      courses:     cart.map(c => ({
+        id: c.id,
+        courseTitle: c.title,
+        thumbnail: c.thumbnail,
+        price: c.price
+      })),
+      totalAmount: cartTotal,
+      slipLink:    slipLink,
+      description: description,
+      status:      'pending',
+      createdAt:   serverTimestamp(),
+      updatedAt:   serverTimestamp()
+    });
+
+    // Create individual enrollment records for tracking
+    for (const course of cart) {
+      await addDoc(collection(db, "enrollments"), {
+        userId:      user.uid,
+        courseId:    course.id,
+        courseTitle: course.title,
+        price:       course.price,
+        orderId:     orderDoc.id,
+        status:      'pending',
+        slipLink:    slipLink,
+        enrolledAt:  serverTimestamp(),
+      });
+    }
+
+    setCart([]);
+    await fetchEnrollments();
+  };
+
   return (
     <CartContext.Provider value={{
       cart, addToCart, removeFromCart, isInCart,
       isEnrolled, isPending, enrollments,
-      loadingEnrollments, cartTotal, buyNow, fetchEnrollments
+      loadingEnrollments, cartTotal, buyNow, fetchEnrollments,
+      submitPayment
     }}>
       {children}
     </CartContext.Provider>

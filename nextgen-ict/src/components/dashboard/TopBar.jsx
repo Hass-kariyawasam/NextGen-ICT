@@ -1,127 +1,208 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  AppBar, Toolbar, Typography, IconButton, Avatar, Box,
-  Menu, MenuItem, ListItemIcon, Divider, Chip, Badge
+  AppBar,
+  Avatar,
+  Badge,
+  Box,
+  Chip,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography
 } from '@mui/material';
-import MenuRoundedIcon        from '@mui/icons-material/MenuRounded';
-import PersonRoundedIcon      from '@mui/icons-material/PersonRounded';
-import SettingsRoundedIcon    from '@mui/icons-material/SettingsRounded';
-import LogoutRoundedIcon      from '@mui/icons-material/LogoutRounded';
+import { motion } from 'framer-motion';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
-import EmojiEventsRoundedIcon  from '@mui/icons-material/EmojiEventsRounded';
-import { useNavigate } from 'react-router-dom';
-import { useAuth }     from '../../context/AuthContext';
-import { useCart }     from '../../context/CartContext';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { db } from '../../firebase/config';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
+import { formatRemainingDays } from '../../utils/courseHelpers';
 
-const EXAM_DATE = new Date('2026-08-10');
-const daysLeft  = () => Math.max(0, Math.ceil((EXAM_DATE - new Date()) / 86400000));
+const PAGE_TITLES = {
+  '/dashboard-lms': 'Dashboard',
+  '/dashboard-lms/courses': 'Courses',
+  '/dashboard-lms/my-courses': 'My Courses',
+  '/dashboard-lms/cart': 'Cart',
+  '/dashboard-lms/settings': 'Settings',
+  '/dashboard-lms/resources': 'Resources',
+  '/dashboard-lms/online-class': 'Online Classes',
+  '/dashboard-lms/practical': 'Practical Classes'
+};
 
-export default function TopBar({ onMenuClick, pageTitle = 'Dashboard' }) {
+export default function TopBar({ onMenuClick }) {
   const { user, userData, logOut } = useAuth();
-  const { cart }                   = useCart();
-  const navigate                   = useNavigate();
-  const [anchor, setAnchor]        = useState(null);
+  const { cart } = useCart();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [examDate, setExamDate] = useState('2026-08-10');
+  const [daysLeft, setDaysLeft] = useState(formatRemainingDays('2026-08-10'));
 
-  // ── Real name from Firestore userData, fallback to Google displayName ──
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'settings'), (snapshot) => {
+      if (!snapshot.empty) {
+        const settings = snapshot.docs[0].data();
+        if (settings.examDate) {
+          setExamDate(settings.examDate);
+          setDaysLeft(formatRemainingDays(settings.examDate));
+        }
+      }
+    });
+
+    const timer = setInterval(() => setDaysLeft(formatRemainingDays(examDate)), 60000);
+    return () => {
+      unsub();
+      clearInterval(timer);
+    };
+  }, [examDate]);
+
+  const pageTitle = useMemo(() => {
+    const direct = PAGE_TITLES[location.pathname];
+    if (direct) return direct;
+    if (location.pathname.includes('/course/')) return 'Course Viewer';
+    return 'Dashboard';
+  }, [location.pathname]);
+
   const displayName = userData?.name || user?.displayName || 'Student';
-  const studentId   = userData?.studentId || '—';
-  const firstLetter = displayName.charAt(0).toUpperCase();
+  const subText = userData?.studentId || userData?.email || user?.email || 'NextGen ICT';
 
   const handleLogout = async () => {
-    setAnchor(null);
+    setAnchorEl(null);
     await logOut();
     navigate('/');
   };
 
   return (
-    <AppBar position="sticky" elevation={0} sx={{
-      bgcolor: '#ffffff', borderBottom: '1px solid #f1f5f9',
-      color: '#1e293b', zIndex: 1100
-    }}>
-      <Toolbar sx={{ px: { xs: 2, sm: 3 }, gap: 2 }}>
-        <IconButton onClick={onMenuClick} sx={{ display: { md: 'none' }, color: '#64748b' }}>
-          <MenuRoundedIcon />
-        </IconButton>
-
-        <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#1e293b' }}>
-          {pageTitle}
-        </Typography>
-
-        <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: '0.85rem', color: '#94a3b8' }}>
-          Hi,&nbsp;<strong style={{ color: '#2563EB' }}>{displayName.split(' ')[0]}</strong>&nbsp;👋
-        </Typography>
-
-        <Box sx={{ flexGrow: 1 }} />
-
-        {/* Exam Countdown */}
-        <Chip
-          icon={<EmojiEventsRoundedIcon sx={{ fontSize: '0.9rem !important' }} />}
-          label={`Exam in ${daysLeft()} days`}
-          size="small"
-          sx={{
-            display: { xs: 'none', sm: 'flex' },
-            bgcolor: daysLeft() < 60 ? '#FEF3C7' : '#EFF6FF',
-            color:   daysLeft() < 60 ? '#92400E' : '#1D4ED8',
-            fontWeight: 600, fontSize: '0.72rem', border: 'none',
+    <AppBar
+      position="fixed"
+      elevation={0}
+      sx={{
+        bgcolor: '#ffffff',
+        borderBottom: '1px solid #e5e7eb',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        px: { xs: 0, sm: 0 },
+        py: { xs: 0, sm: 0 },
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1200,
+        ml: { md: '96px' }
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Toolbar 
+          sx={{ 
+            px: { xs: 1.5, sm: 2.5, lg: 3.5 }, 
+            minHeight: '64px !important', 
+            gap: 2,
+            display: 'flex',
+            alignItems: 'center'
           }}
-        />
-
-        {/* Cart */}
-        <IconButton onClick={() => navigate('/dashboard-lms/cart')} sx={{ color: '#64748b' }}>
-          <Badge badgeContent={cart.length} color="primary">
-            <ShoppingCartRoundedIcon />
-          </Badge>
-        </IconButton>
-
-        {/* Avatar */}
-        <IconButton onClick={e => setAnchor(e.currentTarget)} sx={{ p: 0.5 }}>
-          <Avatar sx={{
-            width: 36, height: 36, bgcolor: '#2563EB',
-            fontSize: '0.875rem', fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(37,99,235,0.3)'
-          }}>
-            {firstLetter}
-          </Avatar>
-        </IconButton>
-
-        {/* Profile Menu */}
-        <Menu
-          anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}
-          PaperProps={{ sx: {
-            mt: 1, minWidth: 210, borderRadius: '14px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-            border: '1px solid #f1f5f9'
-          }}}
         >
-          <Box sx={{ px: 2.5, py: 1.5 }}>
-            <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>
-              {displayName}
-            </Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-              {user?.email}
-            </Typography>
-            {userData?.studentId && (
-              <Typography sx={{ fontSize: '0.72rem', color: '#2563EB', fontWeight: 600, mt: 0.3 }}>
-                ID: {studentId}
-              </Typography>
-            )}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <IconButton onClick={onMenuClick} sx={{ display: { md: 'none' }, color: 'var(--lms-text)' }}>
+              <MenuRoundedIcon />
+            </IconButton>
+          </motion.div>
+
+          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+            <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', letterSpacing: -0.5 }}>{pageTitle}</Typography>
+            <Typography sx={{ fontSize: '0.75rem', color: '#64748b', mt: 0.25 }}>{displayName}</Typography>
           </Box>
-          <Divider />
-          <MenuItem onClick={() => { setAnchor(null); navigate('/dashboard-lms/settings'); }}>
-            <ListItemIcon><PersonRoundedIcon fontSize="small" /></ListItemIcon>
-            Profile
-          </MenuItem>
-          <MenuItem onClick={() => { setAnchor(null); navigate('/dashboard-lms/settings'); }}>
-            <ListItemIcon><SettingsRoundedIcon fontSize="small" /></ListItemIcon>
-            Settings
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={handleLogout} sx={{ color: '#ef4444' }}>
-            <ListItemIcon><LogoutRoundedIcon fontSize="small" sx={{ color: '#ef4444' }} /></ListItemIcon>
-            Logout
-          </MenuItem>
-        </Menu>
-      </Toolbar>
+
+          <motion.div whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }}>
+            <Chip
+              icon={<CalendarMonthRoundedIcon sx={{ color: '#0052cc !important', fontSize: '1.1rem' }} />}
+              label={daysLeft >= 0 ? `${daysLeft} days` : 'Completed'}
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                background: '#f0f4ff',
+                color: '#0052cc',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                borderRadius: '6px',
+                height: 36,
+                border: '1px solid #e0e7ff',
+                '&:hover': { background: '#e6ecff' }
+              }}
+            />
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <IconButton 
+              onClick={() => navigate('/dashboard-lms/cart')} 
+              sx={{ color: '#0f172a', '&:hover': { bgcolor: '#f8f9fa' } }}
+            >
+              <Badge badgeContent={cart.length} color="primary" sx={{ '& .MuiBadge-badge': { background: '#0052cc', color: '#fff', fontSize: '0.7rem' } }}>
+                <ShoppingCartRoundedIcon />
+              </Badge>
+            </IconButton>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <IconButton onClick={(event) => setAnchorEl(event.currentTarget)} sx={{ p: 0.5 }}>
+              <Avatar 
+                sx={{ 
+                  width: 40, 
+                  height: 40, 
+                  background: '#0052cc',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  border: '2px solid #e5e7eb'
+                }}
+              >
+                {displayName.charAt(0).toUpperCase()}
+              </Avatar>
+            </IconButton>
+          </motion.div>
+
+          <Menu 
+            anchorEl={anchorEl} 
+            open={Boolean(anchorEl)} 
+            onClose={() => setAnchorEl(null)}
+            slotProps={{
+              paper: {
+                sx: {
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  mt: 1,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                }
+              }
+            }}
+          >
+            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #e5e7eb' }}>
+              <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{displayName}</Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>{subText}</Typography>
+            </Box>
+            <MenuItem 
+              onClick={() => { setAnchorEl(null); navigate('/dashboard-lms/settings'); }}
+              sx={{ color: '#0f172a', '&:hover': { bgcolor: '#f8f9fa' } }}
+            >
+              <SettingsRoundedIcon sx={{ mr: 1.25, fontSize: '1rem', color: '#0052cc' }} /> Settings
+            </MenuItem>
+            <MenuItem 
+              onClick={handleLogout}
+              sx={{ color: '#ef4444', '&:hover': { bgcolor: 'rgba(239,68,68,0.1)' } }}
+            >
+              <LogoutRoundedIcon sx={{ mr: 1.25, fontSize: '1rem' }} /> Logout
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </motion.div>
     </AppBar>
   );
 }

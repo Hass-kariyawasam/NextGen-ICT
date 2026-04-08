@@ -1,52 +1,56 @@
-import React from 'react';
-import { Box, Grid, Typography, Button } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Box, Button, CircularProgress, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import { mockCourses } from '../../data/mockCourses';
+import { collection, onSnapshot } from 'firebase/firestore';
 import CourseCard from '../../components/dashboard/CourseCard';
+import { useCart } from '../../context/CartContext';
+import { db } from '../../firebase/config';
+import { mockCourses } from '../../data/mockCourses';
+import { normalizeCourse } from '../../utils/courseHelpers';
 
 export default function MyCoursesPage() {
-  const { enrolledCourses } = useCart();
   const navigate = useNavigate();
-  const myCourses = mockCourses.filter(c => enrolledCourses.includes(c.id));
+  const { enrollments, loadingEnrollments } = useCart();
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'courses'),
+      (snapshot) => {
+        if (snapshot.empty) setCourses(mockCourses.map(normalizeCourse));
+        else setCourses(snapshot.docs.map((doc) => normalizeCourse({ id: doc.id, ...doc.data() })));
+      },
+      () => setCourses(mockCourses.map(normalizeCourse))
+    );
+    return () => unsub();
+  }, []);
+
+  const approvedIds = useMemo(() => enrollments.filter((item) => item.status === 'approved').map((item) => item.courseId), [enrollments]);
+  const myCourses = useMemo(() => courses.filter((course) => approvedIds.includes(course.id)), [courses, approvedIds]);
 
   return (
     <Box>
-      <Typography sx={{ fontWeight: 700, fontSize: '1.3rem', color: '#1e293b', mb: 0.5 }}>
-        My Courses
-      </Typography>
-      <Typography sx={{ fontSize: '0.875rem', color: '#94a3b8', mb: 3 }}>
-        {myCourses.length} course{myCourses.length !== 1 ? 's' : ''} enrolled
-      </Typography>
-
-      {myCourses.length === 0 ? (
-        <Box sx={{
-          textAlign: 'center', py: 10, px: 2,
-          border: '2px dashed #e2e8f0', borderRadius: '20px'
-        }}>
-          <Typography sx={{ fontSize: '2rem', mb: 2 }}>📚</Typography>
-          <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b', mb: 1 }}>
-            No Courses Yet
-          </Typography>
-          <Typography sx={{ color: '#94a3b8', mb: 3 }}>
-            Browse our course catalog and start learning today.
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => navigate('/dashboard-lms/courses')}
-            sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
-          >
-            Browse Courses
-          </Button>
+      <Box className="lms-page-head">
+        <Box>
+          <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a' }}>My Courses</Typography>
+          <Typography sx={{ color: '#64748b', fontSize: '0.9rem' }}>Courses that are already approved for your account.</Typography>
         </Box>
-      ) : (
+      </Box>
+
+      {loadingEnrollments ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>
+      ) : myCourses.length ? (
         <Grid container spacing={2.5}>
-          {myCourses.map(course => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={course.id}>
-              <CourseCard course={course} />
-            </Grid>
+          {myCourses.map((course) => (
+            <Grid item xs={12} sm={6} xl={4} key={course.id}><CourseCard course={course} /></Grid>
           ))}
         </Grid>
+      ) : (
+        <Box className="lms-panel" sx={{ borderRadius: 5, py: 8, textAlign: 'center' }}>
+          <Typography sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>No courses available</Typography>
+          <Typography sx={{ color: '#64748b', mb: 2 }}>Buy a course first and wait for admin approval.</Typography>
+          <Button variant="contained" onClick={() => navigate('/dashboard-lms/courses')} sx={{ borderRadius: 3, textTransform: 'none' }}>Browse courses</Button>
+        </Box>
       )}
     </Box>
   );

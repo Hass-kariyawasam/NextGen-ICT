@@ -1,0 +1,225 @@
+.lms-shell {
+  /* Practical, High-Contrast LMS Color Palette */
+  --lms-bg: #f8f9fa;
+  --lms-surface: #ffffff;
+  --lms-surface-strong: #ffffff;
+  --lms-surface-hover: #f5f5f5;
+  --lms-border: #e5e7eb;
+  --lms-border-hover: #d1d5db;
+  --lms-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --lms-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  
+  /* LMS Primary Color - Deep Blue */
+  --lms-primary: #0052cc;
+  --lms-primary-light: #0066ff;
+  --lms-primary-dark: #003385;
+  --lms-primary-soft: rgba(0, 82, 204, 0.08);
+  
+  /* LMS Accent - Orange/Amber */
+  --lms-accent: #ff8c00;
+  --lms-accent-light: #ffaa33;
+  --lms-accent-soft: rgba(255, 140, 0, 0.08);
+  
+  /* Success, Warning, Error */
+  --lms-success: #10b981;
+  --lms-warning: #f59e0b;
+  --lms-error: #ef4444;
+  
+  /* Text Colors - High Contrast */
+  --lms-text: #1f2937;
+  --lms-text-secondary: #4b5563;
+  --lms-muted: #6b7280;
+  
+  /* Input & Form */
+  --lms-input-bg: #f3f4f6;
+  --lms-input-border: #d1d5db;
+  
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.lms-panel {
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border);
+  box-shadow: var(--lms-shadow);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.lms-panel:hover {
+  background: var(--lms-surface-hover);
+  border-color: var(--lms-border-hover);
+  box-shadow: var(--lms-shadow-lg);
+}
+
+.lms-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Modern Card Styles */
+.lms-card-uniform {
+  height: 100%;
+  border-radius: 12px !important;
+  transition: all 0.2s ease;
+}
+
+.lms-card-modern {
+  background: var(--lms-surface) !important;
+  border: 1px solid var(--lms-border) !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease;
+}
+
+.lms-card-modern:hover {
+  background: var(--lms-surface-hover) !important;
+  border-color: var(--lms-border-hover) !important;
+  box-shadow: var(--lms-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.lms-card-interactive {
+  position: relative;
+  overflow: hidden;
+}
+
+.lms-grid-card .MuiCardContent-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.lms-course-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--lms-text);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.lms-course-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  color: var(--lms-text-secondary);
+  line-height: 1.6;
+  font-size: 0.875rem;
+}
+
+.lms-video-frame {
+  position: relative;
+  padding-bottom: 56.25%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.lms-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 12px;
+}
+
+.lms-scroll-list {
+  max-height: 70vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.lms-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lms-scroll-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lms-scroll-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.lms-scroll-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.lms-bottom-nav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1300;
+  border-radius: 16px;
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border);
+  box-shadow: var(--lms-shadow-lg);
+  transition: all 0.2s ease;
+}
+
+.lms-bottom-nav:hover {
+  box-shadow: var(--lms-shadow-lg);
+}
+
+/* Animation Utilities */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lms-animate-in {
+  animation: slideInUp 0.4s ease-out forwards;
+}
+
+.lms-animate-fade {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.lms-animate-scale {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+@media (max-width: 899px) {
+  .lms-shell {
+    padding-bottom: 92px;
+  }
+}

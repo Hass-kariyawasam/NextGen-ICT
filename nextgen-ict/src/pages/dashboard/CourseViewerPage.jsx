@@ -1,243 +1,214 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Box, Grid, Typography, Card, CardContent, List,
-  ListItem, ListItemButton, ListItemText, ListItemIcon,
-  Chip, Button, Divider, Tab, Tabs, Alert
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Grid,
+  List,
+  ListItemButton,
+  Stack,
+  Typography
 } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import PlayCircleRoundedIcon from '@mui/icons-material/PlayCircleRounded';
+import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { useNavigate, useParams } from 'react-router-dom';
+import { db } from '../../firebase/config';
 import { mockCourses } from '../../data/mockCourses';
+import { normalizeCourse } from '../../utils/courseHelpers';
 import { useCart } from '../../context/CartContext';
 
 export default function CourseViewerPage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { isEnrolled, addToCart, isInCart } = useCart();
-  const [activeLesson, setActiveLesson] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+  const { addToCart, isInCart, isEnrolled, isPending } = useCart();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeLessonId, setActiveLessonId] = useState('');
 
-  const course = mockCourses.find(c => c.id === courseId);
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'courses'),
+      (snapshot) => {
+        if (snapshot.empty) setCourses(mockCourses.map(normalizeCourse));
+        else setCourses(snapshot.docs.map((doc) => normalizeCourse({ id: doc.id, ...doc.data() })));
+        setLoading(false);
+      },
+      () => {
+        setCourses(mockCourses.map(normalizeCourse));
+        setLoading(false);
+      }
+    );
+    return () => unsub();
+  }, []);
+
+  const course = useMemo(() => courses.find((item) => item.id === courseId), [courses, courseId]);
   const enrolled = isEnrolled(courseId);
+  const pending = isPending(courseId);
+  const inCart = isInCart(courseId);
+
+  useEffect(() => {
+    if (course?.lessons?.length && !activeLessonId) {
+      setActiveLessonId(course.lessons[0].id);
+    }
+  }, [course, activeLessonId]);
+
+  const activeLesson = useMemo(
+    () => course?.lessons?.find((item) => item.id === activeLessonId) || course?.lessons?.[0],
+    [course, activeLessonId]
+  );
+
+  if (loading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>;
+  }
 
   if (!course) {
     return (
-      <Box sx={{ textAlign: 'center', py: 8 }}>
-        <Typography sx={{ color: '#94a3b8' }}>Course not found.</Typography>
-        <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>Go Back</Button>
+      <Box className="lms-panel" sx={{ borderRadius: 5, py: 8, textAlign: 'center' }}>
+        <Typography sx={{ fontWeight: 800, mb: 1 }}>Course not found</Typography>
+        <Button onClick={() => navigate('/dashboard-lms/courses')}>Go to courses</Button>
       </Box>
     );
   }
 
-  const currentLesson = activeLesson || (enrolled ? course.lessons[0] : null);
-
   return (
     <Box>
-      {/* Back button */}
-      <Button
-        startIcon={<ArrowBackRoundedIcon />}
-        onClick={() => navigate(-1)}
-        sx={{ mb: 2, textTransform: 'none', color: '#64748b' }}
-      >
+      <Button startIcon={<ArrowBackRoundedIcon />} onClick={() => navigate(-1)} sx={{ mb: 2, textTransform: 'none', fontWeight: 700, alignSelf: 'flex-start' }}>
         Back
       </Button>
 
-      <Grid container spacing={3}>
-        {/* Left: Video Player + Tabs */}
-        <Grid item xs={12} md={8}>
-          {/* Video */}
-          <Card sx={{ borderRadius: '16px', overflow: 'hidden', mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-            {enrolled && currentLesson ? (
-              <Box sx={{ position: 'relative', paddingBottom: '56.25%', bgcolor: '#000' }}>
-                <iframe
-                  style={{
-                    position: 'absolute', top: 0, left: 0,
-                    width: '100%', height: '100%', border: 'none'
-                  }}
-                  src={`https://www.youtube.com/embed/${currentLesson.youtubeId}?autoplay=0&rel=0&modestbranding=1`}
-                  title={currentLesson.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </Box>
-            ) : (
-              <Box sx={{
-                position: 'relative', paddingBottom: '56.25%',
-                bgcolor: '#1e293b', overflow: 'hidden'
-              }}>
-                <Box
-                  component="img"
-                  src={course.thumbnail}
-                  sx={{
-                    position: 'absolute', inset: 0, width: '100%', height: '100%',
-                    objectFit: 'cover', opacity: 0.4
-                  }}
-                />
-                <Box sx={{
-                  position: 'absolute', inset: 0, display: 'flex',
-                  flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2
-                }}>
-                  <LockRoundedIcon sx={{ fontSize: '3rem', color: '#fff' }} />
-                  <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem' }}>
-                    Enroll to Watch
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => addToCart(course)}
-                    sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
-                  >
-                    {isInCart(courseId) ? 'In Cart — Go to Cart' : `Add to Cart — Rs. ${course.price.toLocaleString()}`}
-                  </Button>
+      <Grid container spacing={2.5}>
+        <Grid item xs={12} xl={8}>
+          <Card className="lms-panel" sx={{ borderRadius: 6, overflow: 'hidden', mb: 2.5 }}>
+            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
+              {enrolled && activeLesson?.youtubeId ? (
+                <Box className="lms-video-frame">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${activeLesson.youtubeId}?rel=0&modestbranding=1`}
+                    title={activeLesson.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </Box>
-              </Box>
-            )}
+              ) : (
+                <Box className="lms-video-frame" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(180deg, rgba(15,23,42,0.35), rgba(15,23,42,0.78)), url(${course.thumbnail}) center/cover` }}>
+                  <Box sx={{ textAlign: 'center', px: 3 }}>
+                    <LockRoundedIcon sx={{ color: '#ffffff', fontSize: '3rem', mb: 1 }} />
+                    <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', mb: 1 }}>Enroll to watch the lessons</Typography>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.8)', mb: 2.5 }}>Open the course after approval to play each lesson video separately.</Typography>
+                    {pending ? (
+                      <Button disabled variant="outlined" sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.4)' }}>Pending approval</Button>
+                    ) : inCart ? (
+                      <Button variant="contained" onClick={() => navigate('/dashboard-lms/cart')} sx={{ borderRadius: 3, textTransform: 'none' }}>Go to cart</Button>
+                    ) : (
+                      <Button variant="contained" onClick={() => addToCart(course)} sx={{ borderRadius: 3, textTransform: 'none' }}>
+                        Add to cart
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </Box>
           </Card>
 
-          {/* Lesson Info */}
-          {enrolled && currentLesson && (
-            <Card sx={{ borderRadius: '16px', mb: 2, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1px solid #f1f5f9' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b', mb: 1 }}>
-                  {currentLesson.title}
-                </Typography>
+          <Card className="lms-panel" sx={{ borderRadius: 6 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 1.5 }}>
+                <Chip label={course.category} sx={{ fontWeight: 700 }} />
+                <Chip label={`${course.totalLessons} lessons`} variant="outlined" />
+                {course.duration && <Chip label={course.duration} variant="outlined" />}
+              </Stack>
 
-                <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} sx={{ mb: 2 }}>
-                  <Tab label="Description" sx={{ textTransform: 'none' }} />
-                  <Tab label="Notes" sx={{ textTransform: 'none' }} />
-                  <Tab label="PDF" sx={{ textTransform: 'none' }} />
-                </Tabs>
+              <Typography sx={{ fontSize: '1.4rem', fontWeight: 900, color: '#0f172a', mb: 1 }}>{course.title}</Typography>
+              <Typography sx={{ color: '#64748b', lineHeight: 1.8, mb: 2 }}>{course.description}</Typography>
 
-                {activeTab === 0 && (
-                  <Typography sx={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.7 }}>
-                    {currentLesson.description}
-                  </Typography>
+              <Box sx={{ p: 2, borderRadius: 4, bgcolor: 'rgba(15,23,42,0.03)', border: '1px solid rgba(15,23,42,0.06)' }}>
+                <Typography sx={{ fontSize: '0.82rem', color: '#64748b', mb: 0.5 }}>Current Lesson</Typography>
+                <Typography sx={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>{activeLesson?.title || 'No lesson selected'}</Typography>
+                {activeLesson?.duration && <Typography sx={{ fontSize: '0.82rem', color: '#64748b', mt: 0.5 }}>{activeLesson.duration}</Typography>}
+                {activeLesson?.description && (
+                  <Typography sx={{ fontSize: '0.9rem', color: '#475569', mt: 1.25, lineHeight: 1.75 }}>{activeLesson.description}</Typography>
                 )}
-                {activeTab === 1 && (
-                  currentLesson.hasNotes ? (
-                    <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: '12px' }}>
-                      <Typography sx={{ fontSize: '0.875rem', color: '#1e293b', fontWeight: 600, mb: 1 }}>
-                        📝 Lesson Notes
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.8 }}>
-                        Notes for this lesson are available. Key concepts covered include the main topics from the video above. Review these alongside the video for best results.
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Alert severity="info" sx={{ borderRadius: '10px' }}>
-                      No notes available for this lesson yet.
-                    </Alert>
-                  )
-                )}
-                {activeTab === 2 && (
-                  currentLesson.hasPdf ? (
-                    <Box>
-                      <Button
-                        variant="outlined"
-                        startIcon={<PictureAsPdfRoundedIcon />}
-                        sx={{ borderRadius: '10px', textTransform: 'none' }}
-                      >
-                        Download Lesson PDF
-                      </Button>
-                    </Box>
-                  ) : (
-                    <Alert severity="info" sx={{ borderRadius: '10px' }}>
-                      No PDF available for this lesson yet.
-                    </Alert>
-                  )
-                )}
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Course Info (non-enrolled) */}
-          {!enrolled && (
-            <Card sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '1.2rem', color: '#1e293b', mb: 1 }}>
-                  {course.title}
-                </Typography>
-                <Typography sx={{ fontSize: '0.9rem', color: '#64748b', mb: 2, lineHeight: 1.7 }}>
-                  {course.description}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-                  <Chip label={`👨‍🏫 ${course.teacher}`} sx={{ bgcolor: '#F8FAFC' }} />
-                  <Chip label={`📚 ${course.totalLessons} Lessons`} sx={{ bgcolor: '#F8FAFC' }} />
-                  <Chip label={`⏱ ${course.duration}`} sx={{ bgcolor: '#F8FAFC' }} />
-                  <Chip label={`⭐ ${course.rating}/5`} sx={{ bgcolor: '#FFF7ED', color: '#C2410C' }} />
-                </Box>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography sx={{ fontWeight: 800, fontSize: '1.5rem', color: '#1e293b' }}>
-                    {course.price === 0 ? 'Free' : `Rs. ${course.price.toLocaleString()}`}
-                  </Typography>
-                  <Button
-                    variant="contained" size="large"
-                    onClick={() => addToCart(course)}
-                    disabled={isInCart(courseId)}
-                    sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600 }}
-                  >
-                    {isInCart(courseId) ? 'Added to Cart ✓' : 'Add to Cart'}
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          )}
+                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 2 }}>
+                  {activeLesson?.notesLink && (
+                    <Button component="a" href={activeLesson.notesLink} target="_blank" rel="noreferrer" variant="outlined" startIcon={<DescriptionRoundedIcon />} sx={{ textTransform: 'none', borderRadius: 3 }}>
+                      Lesson notes
+                    </Button>
+                  )}
+                  {activeLesson?.pdfLink && (
+                    <Button component="a" href={activeLesson.pdfLink} target="_blank" rel="noreferrer" variant="outlined" startIcon={<PictureAsPdfRoundedIcon />} sx={{ textTransform: 'none', borderRadius: 3 }}>
+                      Lesson PDF
+                    </Button>
+                  )}
+                </Stack>
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
 
-        {/* Right: Lessons List */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{
-            borderRadius: '16px', border: '1px solid #f1f5f9',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-            position: { md: 'sticky' }, top: { md: 80 }
-          }}>
+        <Grid item xs={12} xl={4}>
+          <Card className="lms-panel" sx={{ borderRadius: 6, position: { xl: 'sticky' }, top: 110 }}>
             <CardContent sx={{ p: 0 }}>
-              <Box sx={{ p: 2.5, borderBottom: '1px solid #f1f5f9' }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>
-                  Course Content
-                </Typography>
-                <Typography sx={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                  {course.lessons.length} lessons • {course.duration}
-                </Typography>
+              <Box sx={{ px: 2.25, py: 2, borderBottom: '1px solid rgba(15,23,42,0.08)' }}>
+                <Typography sx={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Lessons</Typography>
+                <Typography sx={{ fontSize: '0.8rem', color: '#64748b' }}>Each lesson has its own video, title, description, and attachments.</Typography>
               </Box>
-              <List sx={{ p: 1 }}>
-                {course.lessons.map((lesson, index) => (
-                  <ListItem key={lesson.id} disablePadding sx={{ mb: 0.5 }}>
+
+              <List className="lms-scroll-list" sx={{ px: 1.25, py: 1.25 }}>
+                {course.lessons.map((lesson, index) => {
+                  const selected = activeLesson?.id === lesson.id;
+                  return (
                     <ListItemButton
+                      key={lesson.id}
+                      onClick={() => enrolled && setActiveLessonId(lesson.id)}
                       disabled={!enrolled}
-                      selected={currentLesson?.id === lesson.id}
-                      onClick={() => setActiveLesson(lesson)}
                       sx={{
-                        borderRadius: '10px', py: 1.5,
-                        '&.Mui-selected': { bgcolor: '#EFF6FF' },
-                        '&.Mui-disabled': { opacity: 0.5 }
+                        mb: 1,
+                        alignItems: 'flex-start',
+                        borderRadius: 4,
+                        border: '1px solid rgba(15,23,42,0.06)',
+                        bgcolor: selected ? 'rgba(28,63,170,0.08)' : '#fff',
+                        p: 1.5,
+                        '&.Mui-disabled': { opacity: 0.55 }
                       }}
                     >
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        {enrolled
-                          ? <PlayCircleRoundedIcon sx={{ color: currentLesson?.id === lesson.id ? '#2563EB' : '#94a3b8', fontSize: '1.2rem' }} />
-                          : <LockRoundedIcon sx={{ color: '#cbd5e1', fontSize: '1rem' }} />
-                        }
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={`${index + 1}. ${lesson.title}`}
-                        secondary={lesson.duration}
-                        primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 500, color: '#1e293b' }}
-                        secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                      />
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        {lesson.hasNotes && <DescriptionRoundedIcon sx={{ fontSize: '0.9rem', color: '#94a3b8' }} />}
-                        {lesson.hasPdf && <PictureAsPdfRoundedIcon sx={{ fontSize: '0.9rem', color: '#94a3b8' }} />}
+                      <Box sx={{ width: 34, height: 34, borderRadius: 2.5, bgcolor: selected ? '#1c3faa' : 'rgba(15,23,42,0.06)', color: selected ? '#fff' : '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                        {enrolled ? <PlayCircleRoundedIcon sx={{ fontSize: '1rem' }} /> : <LockRoundedIcon sx={{ fontSize: '1rem' }} />}
+                      </Box>
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                        <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
+                          {index + 1}. {lesson.title}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.6 }}>
+                          {lesson.description || 'Lesson details will appear here.'}
+                        </Typography>
+                        <Stack direction="row" spacing={1.25} sx={{ mt: 1 }}>
+                          {lesson.duration && <Typography sx={{ fontSize: '0.74rem', color: '#475569' }}>{lesson.duration}</Typography>}
+                          {lesson.notesLink && <DescriptionRoundedIcon sx={{ fontSize: '0.92rem', color: '#64748b' }} />}
+                          {lesson.pdfLink && <PictureAsPdfRoundedIcon sx={{ fontSize: '0.92rem', color: '#64748b' }} />}
+                        </Stack>
                       </Box>
                     </ListItemButton>
-                  </ListItem>
-                ))}
+                  );
+                })}
               </List>
             </CardContent>
           </Card>
+
+          {!enrolled && (
+            <Alert severity="info" sx={{ mt: 2, borderRadius: 4 }} icon={<MenuBookRoundedIcon fontSize="inherit" />}>
+              The lesson list is visible, but video playback and lesson materials unlock only after admin approval.
+            </Alert>
+          )}
         </Grid>
       </Grid>
     </Box>

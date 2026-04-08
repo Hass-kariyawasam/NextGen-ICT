@@ -1,315 +1,230 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box, Card, CardContent, Typography, List, ListItem,
-  ListItemText, Chip, Divider, Alert, CircularProgress
-} from '@mui/material';
-import {
-  Schedule as ScheduleIcon,
-  LiveTv as LiveIcon,
-  Assignment as ExamIcon,
-  Code as PracticalIcon,
-  Notifications as NotificationsIcon
-} from '@mui/icons-material';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Box, Card, CardContent, CircularProgress, Divider, List, ListItem, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { mockNotices, mockSchedule } from '../../data/mockCourses';
 
-// ===== SCHEDULE WIDGET =====
+function EmptyState({ title }) {
+  return <Typography sx={{ color: 'var(--lms-text-secondary)', fontSize: '0.85rem' }}>{title}</Typography>;
+}
+
 export function ScheduleWidget() {
-  const [schedules, setSchedules] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSchedules();
+    const unsub = onSnapshot(
+      query(collection(db, 'schedules'), orderBy('date', 'asc'), limit(5)),
+      (snapshot) => {
+        setItems(snapshot.empty ? mockSchedule : snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        setLoading(false);
+      },
+      () => {
+        setItems(mockSchedule);
+        setLoading(false);
+      }
+    );
+    return () => unsub();
   }, []);
 
-  const fetchSchedules = async () => {
-    try {
-      const q = query(
-        collection(db, 'schedules'),
-        orderBy('date', 'asc'),
-        limit(5)
-      );
-      const snap = await getDocs(q);
-      const schedulesList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      
-      // Filter only upcoming schedules
-      const today = new Date().toISOString().split('T')[0];
-      const upcoming = schedulesList.filter(s => s.date >= today);
-      
-      setSchedules(upcoming);
-    } catch (error) {
-      console.error('Error fetching schedules:', error);
-      // If schedules collection doesn't exist, use empty array
-      setSchedules([]);
-    }
-    setLoading(false);
-  };
-
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'live': return <LiveIcon sx={{ fontSize: '1.1rem' }} />;
-      case 'exam': return <ExamIcon sx={{ fontSize: '1.1rem' }} />;
-      case 'practical': return <PracticalIcon sx={{ fontSize: '1.1rem' }} />;
-      default: return <ScheduleIcon sx={{ fontSize: '1.1rem' }} />;
-    }
-  };
-
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'live': return { bg: '#EFF6FF', color: '#2563EB' };
-      case 'exam': return { bg: '#FFF7ED', color: '#C2410C' };
-      case 'practical': return { bg: '#F0FDF4', color: '#15803D' };
-      default: return { bg: '#F8FAFC', color: '#64748b' };
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short'
-    });
-  };
-
-  if (loading) {
-    return (
-      <Card sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', p: 3 }}>
-        <CircularProgress size={24} />
-      </Card>
-    );
-  }
-
   return (
-    <Card sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-      <CardContent sx={{ p: 0 }}>
-        {/* Header */}
-        <Box sx={{ p: 2.5, borderBottom: '1px solid #f1f5f9' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '10px',
-                bgcolor: '#EFF6FF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+    >
+      <Card 
+        className="lms-panel" 
+        sx={{ 
+          borderRadius: '12px !important', 
+          height: '100%',
+          background: 'var(--lms-surface)',
+          border: '1px solid var(--lms-border)',
+          overflow: 'hidden'
+        }}
+      >
+        <CardContent sx={{ p: 0 }}>
+          <Box sx={{ 
+            px: 2, 
+            py: 2, 
+            borderBottom: '1px solid var(--lms-border)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            background: 'var(--lms-primary-soft)'
+          }}>
+            <motion.div
+              animate={{ y: [0, -2, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              <ScheduleIcon sx={{ color: '#2563EB', fontSize: '1.3rem' }} />
-            </Box>
-            <Box>
-              <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1e293b' }}>
-                Upcoming Schedule
-              </Typography>
-              <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                {schedules.length} upcoming {schedules.length === 1 ? 'event' : 'events'}
-              </Typography>
-            </Box>
+              <EventAvailableRoundedIcon sx={{ color: 'var(--lms-primary)', fontSize: '1.2rem' }} />
+            </motion.div>
+            <Typography sx={{ fontWeight: 700, color: 'var(--lms-text)', fontSize: '0.95rem' }}>Upcoming Schedule</Typography>
           </Box>
-        </Box>
-
-        {/* Schedule List */}
-        <List sx={{ p: 1 }}>
-          {schedules.length === 0 ? (
-            <ListItem>
-              <ListItemText
-                primary={
-                  <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', textAlign: 'center', py: 2 }}>
-                    No upcoming events scheduled
-                  </Typography>
-                }
-              />
-            </ListItem>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <CircularProgress size={28} sx={{ color: 'var(--lms-primary)' }} />
+            </Box>
           ) : (
-            schedules.map((schedule, index) => {
-              const typeStyle = getTypeColor(schedule.type);
-              return (
-                <React.Fragment key={schedule.id}>
-                  <ListItem
-                    sx={{
-                      borderRadius: '12px',
-                      mb: 0.5,
-                      transition: 'background 0.2s',
-                      '&:hover': { bgcolor: '#F8FAFC' }
+            <Box sx={{ p: 1.5 }}>
+              {items.length ? items.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  style={{ display: 'block' }}
+                >
+                  <Box 
+                    sx={{ 
+                      display: 'flex',
+                      gap: 1.5,
+                      px: 1.25, 
+                      py: 1.25,
+                      borderRadius: '8px',
+                      mb: index < items.length - 1 ? 0.75 : 0,
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        background: 'var(--lms-primary-soft)',
+                        borderLeft: '3px solid var(--lms-primary)'
+                      }
                     }}
                   >
-                    <Box sx={{ mr: 2, textAlign: 'center', minWidth: 60 }}>
-                      <Typography sx={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, mb: 0.5 }}>
-                        {formatDate(schedule.date).split(' ')[0]} {/* Weekday */}
+                    <Box sx={{ 
+                      minWidth: '48px', 
+                      height: '48px', 
+                      borderRadius: '8px', 
+                      background: 'var(--lms-primary-soft)',
+                      border: '1px solid var(--lms-border)',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      color: 'var(--lms-primary)',
+                      fontWeight: 700,
+                      fontSize: '0.9rem'
+                    }}>
+                      {item.date?.split('-')[2]}
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lms-text)' }}>
+                        {item.title}
                       </Typography>
-                      <Typography sx={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e293b', lineHeight: 1 }}>
-                        {formatDate(schedule.date).split(' ')[2]} {/* Day */}
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                        {formatDate(schedule.date).split(' ')[1]} {/* Month */}
+                      <Typography sx={{ fontSize: '0.75rem', color: 'var(--lms-text-secondary)', mt: 0.25 }}>
+                        {item.time || 'All day'} {item.course ? `• ${item.course}` : ''}
                       </Typography>
                     </Box>
-                    
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b', mb: 0.5 }}>
-                          {schedule.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                          <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>
-                            ⏰ {schedule.time}
-                          </Typography>
-                          {schedule.course && (
-                            <>
-                              <Typography sx={{ color: '#e2e8f0' }}>•</Typography>
-                              <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                {schedule.course}
-                              </Typography>
-                            </>
-                          )}
-                        </Box>
-                      }
-                    />
-                    
-                    <Chip
-                      icon={getTypeIcon(schedule.type)}
-                      label={schedule.type}
-                      size="small"
-                      sx={{
-                        bgcolor: typeStyle.bg,
-                        color: typeStyle.color,
-                        fontWeight: 600,
-                        fontSize: '0.7rem',
-                        textTransform: 'capitalize'
-                      }}
-                    />
-                  </ListItem>
-                  {index < schedules.length - 1 && <Divider sx={{ mx: 2 }} />}
-                </React.Fragment>
-              );
-            })
+                  </Box>
+                </motion.div>
+              )) : <Box sx={{ px: 2, py: 5, textAlign: 'center' }}><EmptyState title="No schedules available." /></Box>}
+            </Box>
           )}
-        </List>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
-// ===== NOTICES WIDGET =====
 export function NoticesWidget() {
-  const [notices, setNotices] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchNotices();
+    const unsub = onSnapshot(
+      query(collection(db, 'notices'), orderBy('createdAt', 'desc'), limit(5)),
+      (snapshot) => {
+        setItems(snapshot.empty ? mockNotices : snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        setLoading(false);
+      },
+      () => {
+        setItems(mockNotices);
+        setLoading(false);
+      }
+    );
+    return () => unsub();
   }, []);
 
-  const fetchNotices = async () => {
-    try {
-      const q = query(
-        collection(db, 'notices'),
-        orderBy('createdAt', 'desc'),
-        limit(4)
-      );
-      const snap = await getDocs(q);
-      setNotices(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    } catch (error) {
-      console.error('Error fetching notices:', error);
-      // If notices collection doesn't exist, use empty array
-      setNotices([]);
-    }
-    setLoading(false);
-  };
-
-  const getNoticeIcon = (type) => {
-    switch (type) {
-      case 'success': return '✅';
-      case 'warning': return '⚠️';
-      case 'error': return '🚨';
-      default: return 'ℹ️';
-    }
-  };
-
-  if (loading) {
-    return (
-      <Card sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', p: 3 }}>
-        <CircularProgress size={24} />
-      </Card>
-    );
-  }
-
   return (
-    <Card sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-      <CardContent sx={{ p: 0 }}>
-        {/* Header */}
-        <Box sx={{ p: 2.5, borderBottom: '1px solid #f1f5f9' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '10px',
-                bgcolor: '#FFF7ED',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+    >
+      <Card 
+        className="lms-panel" 
+        sx={{ 
+          borderRadius: '12px !important', 
+          height: '100%',
+          background: 'var(--lms-surface)',
+          border: '1px solid var(--lms-border)',
+          overflow: 'hidden'
+        }}
+      >
+        <CardContent sx={{ p: 0 }}>
+          <Box sx={{ 
+            px: 2, 
+            py: 2, 
+            borderBottom: '1px solid var(--lms-border)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            background: 'rgba(255, 140, 0, 0.08)'
+          }}>
+            <motion.div
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              <NotificationsIcon sx={{ color: '#C2410C', fontSize: '1.3rem' }} />
-            </Box>
-            <Box>
-              <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1e293b' }}>
-                Recent Notices
-              </Typography>
-              <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                Important announcements
-              </Typography>
-            </Box>
+              <NotificationsRoundedIcon sx={{ color: 'var(--lms-accent)', fontSize: '1.2rem' }} />
+            </motion.div>
+            <Typography sx={{ fontWeight: 700, color: 'var(--lms-text)', fontSize: '0.95rem' }}>Notices</Typography>
           </Box>
-        </Box>
-
-        {/* Notices List */}
-        <Box sx={{ p: 2 }}>
-          {notices.length === 0 ? (
-            <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', textAlign: 'center', py: 2 }}>
-              No notices available
-            </Typography>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <CircularProgress size={28} sx={{ color: 'var(--lms-accent)' }} />
+            </Box>
           ) : (
-            notices.map((notice) => (
-              <Alert
-                key={notice.id}
-                severity={notice.type || 'info'}
-                icon={<span style={{ fontSize: '1.2rem' }}>{getNoticeIcon(notice.type)}</span>}
-                sx={{
-                  mb: 1.5,
-                  borderRadius: '12px',
-                  '& .MuiAlert-message': {
-                    width: '100%'
-                  },
-                  '&:last-child': {
-                    mb: 0
-                  }
-                }}
-              >
-                <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', mb: 0.5 }}>
-                  {notice.title}
-                </Typography>
-                <Typography sx={{ fontSize: '0.8rem', lineHeight: 1.5 }}>
-                  {notice.message}
-                </Typography>
-                {notice.date && (
-                  <Typography sx={{ fontSize: '0.7rem', color: '#64748b', mt: 0.5 }}>
-                    {new Date(notice.date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </Typography>
-                )}
-              </Alert>
-            ))
+            <Box sx={{ p: 1.5 }}>
+              {items.length ? items.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  style={{ display: 'block' }}
+                >
+                  <Box 
+                    sx={{ 
+                      px: 1.25, 
+                      py: 1.25,
+                      borderRadius: '8px',
+                      mb: index < items.length - 1 ? 0.75 : 0,
+                      borderLeft: '3px solid var(--lms-accent)',
+                      background: 'rgba(255, 140, 0, 0.04)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        background: 'rgba(255, 140, 0, 0.08)',
+                        transform: 'translateX(2px)'
+                      }
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lms-text)', mb: 0.3 }}>
+                      {item.title}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: 'var(--lms-text-secondary)', mb: 0.3, lineHeight: 1.5 }}>
+                      {item.message}
+                    </Typography>
+                    {item.date && (
+                      <Typography sx={{ fontSize: '0.7rem', color: 'var(--lms-accent)', fontWeight: 500 }}>
+                        {item.date}
+                      </Typography>
+                    )}
+                  </Box>
+                </motion.div>
+              )) : <Box sx={{ px: 2, py: 5, textAlign: 'center' }}><EmptyState title="No notices available." /></Box>}
+            </Box>
           )}
-        </Box>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
